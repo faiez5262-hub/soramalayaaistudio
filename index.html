@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8" />
+  <title>Sora Malaya UGC Prompt Generator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #05040a;
+      --card: #11111b;
+      --input: #181825;
+      --border: #2f3140;
+      --accent: #fbbf24;
+      --accent-soft: rgba(251,191,36,0.15);
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --danger: #f87171;
+      --radius: 14px;
+    }
+    * {
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        "Segoe UI", sans-serif;
+    }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(circle at top, #111827 0, #020617 45%, #000 100%);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      padding: 24px 12px 40px;
+    }
+    .page {
+      width: 100%;
+      max-width: 960px;
+    }
+    .header {
+      margin-bottom: 16px;
+    }
+    .title {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: 0.03em;
+    }
+    .subtitle {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .card {
+      background: rgba(9,9,15,0.96);
+      border-radius: 20px;
+      border: 1px solid rgba(148,163,184,0.22);
+      box-shadow: 0 18px 45px rgba(15,23,42,0.65);
+      padding: 18px 16px 20px;
+      backdrop-filter: blur(12px);
+    }
+    @media (min-width: 768px) {
+      .card {
+        padding: 22px 22px 26px;
+      }
+      .title {
+        font-size: 32px;
+      }
+    }
+
+    .section-title {
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      margin: 18px 0 6px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    @media (min-width: 768px) {
+      .grid-2 {
+        grid-template-columns: repeat(2, minmax(0,1fr));
+      }
+    }
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 8px;
+    }
+    .label-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+    }
+    label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #e5e7eb;
+    }
+    .hint {
+      font-size: 11px;
+      color: var(--muted);
+    }
+    input[type="text"],
+    input[type="number"],
+    textarea,
+    select {
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      padding: 8px 10px;
+      font-size: 13px;
+      color: var(--text);
+      background: var(--input);
+      outline: none;
+      transition: border 0.15s, box-shadow 0.15s, background 0.15s;
+    }
+    input::placeholder,
+    textarea::placeholder {
+      color: #6b7280;
+      font-size: 12px;
+    }
+    input:focus,
+    textarea:focus,
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(251,191,36,0.4);
+    }
+    textarea {
+      min-height: 70px;
+      resize: vertical;
+    }
+    .small-input-row {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap: 8px;
+    }
+
+    .preset-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 4px 0 10px;
+    }
+    .preset-btn {
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.4);
+      background: rgba(15,23,42,0.85);
+      color: var(--muted);
+      font-size: 11px;
+      padding: 6px 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: background 0.15s, border 0.15s, color 0.15s, transform 0.12s;
+    }
+    .preset-btn span {
+      font-size: 13px;
+    }
+    .preset-btn:hover {
+      background: rgba(30,64,175,0.45);
+      border-color: rgba(191,219,254,0.8);
+      color: #e5e7eb;
+      transform: translateY(-0.5px);
+    }
+    .preset-btn.active {
+      background: linear-gradient(135deg,#facc15,#fb923c);
+      border-color: transparent;
+      color: #111827;
+      box-shadow: 0 10px 25px rgba(248,250,252,0.18);
+    }
+
+    .file-note {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .button-primary {
+      width: 100%;
+      margin-top: 14px;
+      padding: 11px 14px;
+      border-radius: 999px;
+      border: none;
+      background: linear-gradient(135deg,#facc15,#fb923c);
+      color: #111827;
+      font-weight: 700;
+      font-size: 15px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      box-shadow: 0 18px 40px rgba(250,204,21,0.35);
+      transition: transform 0.12s, box-shadow 0.12s, filter 0.12s;
+    }
+    .button-primary:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.05);
+      box-shadow: 0 22px 50px rgba(250,204,21,0.45);
+    }
+    .button-primary:active {
+      transform: translateY(0);
+      box-shadow: 0 10px 25px rgba(250,204,21,0.35);
+    }
+
+    .output-card {
+      margin-top: 18px;
+      background: radial-gradient(circle at top left, #1e293b 0, #020617 55%);
+      border-radius: 18px;
+      padding: 16px 14px 14px;
+      border: 1px solid rgba(148,163,184,0.4);
+    }
+    .output-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .output-title {
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .output-sub {
+      font-size: 11px;
+      color: var(--muted);
+    }
+    #output {
+      width: 100%;
+      min-height: 260px;
+      border-radius: 10px;
+      border: 1px solid rgba(55,65,81,0.9);
+      padding: 10px;
+      background: #020617;
+      color: #e5e7eb;
+      font-family: "JetBrains Mono","SF Mono",ui-monospace,Menlo,Monaco,Consolas,monospace;
+      font-size: 11px;
+      line-height: 1.45;
+      resize: vertical;
+      white-space: pre;
+    }
+    .copy-btn {
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.6);
+      background: rgba(15,23,42,0.9);
+      color: #e5e7eb;
+      font-size: 11px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: background 0.15s, border 0.15s, transform 0.1s;
+    }
+    .copy-btn:hover {
+      background: rgba(30,64,175,0.8);
+      border-color: rgba(191,219,254,0.95);
+      transform: translateY(-0.5px);
+    }
+    .copy-btn.success {
+      border-color: #22c55e;
+      color: #bbf7d0;
+      background: rgba(22,163,74,0.26);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 9px;
+      border-radius: 999px;
+      background: rgba(15,23,42,0.9);
+      border: 1px solid rgba(148,163,184,0.45);
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: #22c55e;
+      box-shadow: 0 0 0 4px rgba(34,197,94,0.25);
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="header">
+      <div class="title">Sora Malaya UGC Prompt Generator</div>
+      <div class="subtitle">
+        Isi form → klik <b>Generate JSON UGC</b> → copy & paste terus ke GPT / Sora sebagai template.
+      </div>
+    </div>
+
+    <div class="card">
+      <form id="ugcForm" autocomplete="off">
+        <div class="section-title">Maklumat Produk</div>
+
+        <div class="grid-2">
+          <div class="field">
+            <div class="label-row">
+              <label for="product_name">Nama Produk</label>
+            </div>
+            <input id="product_name" type="text" required
+              placeholder="Contoh: Nasi Lemak Daun Pisang Abang Long" />
+          </div>
+
+          <div class="field">
+            <div class="label-row">
+              <label for="product_type">Jenis Produk</label>
+            </div>
+            <input id="product_type" type="text" required
+              placeholder="Contoh: Food, Skincare, Service, App, Fashion" />
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="field">
+            <div class="label-row">
+              <label for="product_category">Kategori Produk</label>
+            </div>
+            <input id="product_category" type="text" required
+              placeholder="Contoh: Food & Beverage, Skincare, Education" />
+          </div>
+
+          <div class="field">
+            <div class="label-row">
+              <label for="additional_notes">Nota Tambahan (konteks brand)</label>
+            </div>
+            <input id="brand_notes" type="text"
+              placeholder="Contoh: Halal, fokus ibu bekerja, target student universiti" />
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="label-row">
+            <label for="product_image">Gambar Rujukan Produk (opsyenal)</label>
+          </div>
+          <input id="product_image" type="file" accept="image/*" />
+          <div class="file-note">
+            Tiada gambar akan di-upload ke server. Gambar ini hanya untuk rujukan visual abang sendiri.
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="field">
+            <div class="label-row">
+              <label for="main_benefits">Manfaat Utama (pisahkan dengan koma)</label>
+            </div>
+            <textarea id="main_benefits" placeholder="Contoh: sambal padu, harga mampu milik, mengenyangkan"></textarea>
+          </div>
+
+          <div class="field">
+            <div class="label-row">
+              <label for="selling_points">Selling Point / Keunikan (pisahkan dengan koma)</label>
+            </div>
+            <textarea id="selling_points" placeholder="Contoh: guna santan segar, lauk hari-hari tukar, bau wangi satu rumah"></textarea>
+          </div>
+        </div>
+
+        <div class="section-title">Preset Auto Isi (Opsyen)</div>
+        <div class="preset-row">
+          <button type="button" class="preset-btn" data-preset="food">
+            🍛 <span>Food / F&B</span>
+          </button>
+          <button type="button" class="preset-btn" data-preset="skincare">
+            💧 <span>Skincare / Beauty</span>
+          </button>
+          <button type="button" class="preset-btn" data-preset="service">
+            🧑‍💼 <span>Servis / Coaching</span>
+          </button>
+          <button type="button" class="preset-btn" data-preset="app">
+            📱 <span>App / Software</span>
+          </button>
+          <button type="button" class="preset-btn" data-preset="fashion">
+            👗 <span>Fashion / Outfit</span>
+          </button>
+        </div>
+        <div class="badge">
+          <div class="badge-dot"></div>
+          <span>Preset hanya bantu isi contoh – semua field masih boleh edit.</span>
+        </div>
+
+        <div class="section-title">Gaya Video & UGC</div>
+
+        <div class="field">
+          <div class="label-row">
+            <label for="video_style_category">Video Style Category</label>
+            <span class="hint">Contoh: Lifestyle casual, Food review, POV harian</span>
+          </div>
+          <input id="video_style_category" type="text"
+            value=""
+            placeholder="Contoh: Food review, POV harian, Lifestyle casual" />
+        </div>
+
+        <div class="grid-2">
+          <div class="field">
+            <div class="label-row">
+              <label for="ugc_hook_type">UGC Hook Type</label>
+              <span class="hint">Hook wajib keluar dalam 1–2 saat pertama</span>
+            </div>
+            <input id="ugc_hook_type" type="text"
+              value=""
+              placeholder="Contoh: Visual hook, Reaction hook, Story hook" />
+          </div>
+
+          <div class="field">
+            <div class="label-row">
+              <label for="ugc_angle_type">UGC Angle Type</label>
+              <span class="hint">Angle ikut gaya penceritaan</span>
+            </div>
+            <input id="ugc_angle_type" type="text"
+              value=""
+              placeholder="Contoh: Honest review, First time try, Problem-solution" />
+          </div>
+        </div>
+
+        <div class="section-title">Maklumat Talent & Suara</div>
+
+        <div class="grid-2">
+          <div class="field">
+            <div class="label-row">
+              <label for="talent_gender">Gender Talent</label>
+            </div>
+            <select id="talent_gender">
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Any">Any</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <div class="label-row">
+              <label for="talent_age_range">Umur Talent (range)</label>
+            </div>
+            <input id="talent_age_range" type="text"
+              placeholder="Contoh: 18–24, 25–34" />
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="field">
+            <div class="label-row">
+              <label for="talent_look">Gaya Look</label>
+            </div>
+            <input id="talent_look" type="text"
+              placeholder="Contoh: Casual, Professional, Smart casual" />
+          </div>
+
+          <div class="field">
+            <div class="label-row">
+              <label for="talent_personality">Personaliti Talent</label>
+            </div>
+            <input id="talent_personality" type="text"
+              placeholder="Contoh: Friendly, Calm & warm, Playful" />
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="label-row">
+            <label for="clothing_style">Gaya Pakaian</label>
+          </div>
+          <input id="clothing_style" type="text"
+            placeholder="Contoh: T-shirt plain, Smart casual, Baju kurung / hijab" />
+        </div>
+
+        <div class="grid-2">
+          <div class="field">
+            <div class="label-row">
+              <label for="voice_tempo">Tempo Suara</label>
+              <span class="hint">Cadangan: 0.90–0.96 untuk emosi & lipsync</span>
+            </div>
+            <input id="voice_tempo" type="number" step="0.01" value="0.94" />
+          </div>
+
+          <div class="field">
+            <div class="label-row">
+              <label for="voice_emotion">Emosi Suara</label>
+            </div>
+            <input id="voice_emotion" type="text" value="warm_friendly"
+              placeholder="Contoh: warm_friendly, calm_trust, emotional_soft" />
+          </div>
+        </div>
+
+        <div class="section-title">Warna, Lighting & Durasi</div>
+
+        <div class="small-input-row">
+          <div class="field">
+            <div class="label-row">
+              <label for="vibrance_level">Vibrance Level</label>
+            </div>
+            <input id="vibrance_level" type="number" value="12" />
+          </div>
+
+          <div class="field">
+            <div class="label-row">
+              <label for="exposure_level">Exposure Level</label>
+            </div>
+            <input id="exposure_level" type="number" step="0.1" value="0.2" />
+          </div>
+
+          <div class="field">
+            <div class="label-row">
+              <label for="temperature">Temperature</label>
+            </div>
+            <select id="temperature">
+              <option value="warm" selected>warm</option>
+              <option value="neutral">neutral</option>
+              <option value="cool">cool</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="label-row">
+            <label for="additional_notes">Nota Tambahan Visual</label>
+          </div>
+          <textarea id="additional_notes"
+            placeholder="Contoh: Shoot dekat dapur rumah atau kedai makan, suasana pagi / petang, ada steam keluar dari makanan, lampu lembut dan cozy."></textarea>
+        </div>
+
+        <div class="grid-2">
+          <div class="field">
+            <div class="label-row">
+              <label for="scene_count">Jumlah Scene</label>
+            </div>
+            <input id="scene_count" type="number" min="3" max="6" value="4" />
+          </div>
+
+          <div class="field">
+            <div class="label-row">
+              <label for="duration_target">Durasi Sasaran (saat)</label>
+            </div>
+            <input id="duration_target" type="number" min="8" max="20" value="12"
+              placeholder="Contoh: 10, 12, 15" />
+          </div>
+        </div>
+
+        <button type="submit" class="button-primary">
+          🚀 Generate JSON UGC
+        </button>
+      </form>
+
+      <div class="output-card">
+        <div class="output-header">
+          <div>
+            <div class="output-title">Output JSON Siap Pakai</div>
+            <div class="output-sub">
+              Copy → paste terus ke GPT / Sora / Notion sebagai template.
+            </div>
+          </div>
+          <button type="button" class="copy-btn" id="copyBtn">
+            📋 Copy JSON
+          </button>
+        </div>
+        <textarea id="output" readonly></textarea>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById("ugcForm");
+    const outputEl = document.getElementById("output");
+    const copyBtn = document.getElementById("copyBtn");
+    const presetButtons = document.querySelectorAll(".preset-btn");
+
+    function setActivePreset(btn) {
+      presetButtons.forEach(b => b.classList.remove("active"));
+      if (btn) btn.classList.add("active");
+    }
+
+    function applyPreset(type, btn) {
+      setActivePreset(btn);
+
+      const videoStyle = document.getElementById("video_style_category");
+      const hookType = document.getElementById("ugc_hook_type");
+      const angleType = document.getElementById("ugc_angle_type");
+      const notes = document.getElementById("additional_notes");
+      const voiceEmotion = document.getElementById("voice_emotion");
+      const talentLook = document.getElementById("talent_look");
+      const talentPersonality = document.getElementById("talent_personality");
+
+      if (type === "food") {
+        videoStyle.value = "Food review, POV harian, Lifestyle casual";
+        hookType.value = "Visual hook, Reaction hook";
+        angleType.value = "Honest review, First time try";
+        notes.value = "Shoot dekat dapur rumah atau kedai makan, suasana pagi atau petang, ada steam keluar dari makanan, lampu lembut dan cozy.";
+        voiceEmotion.value = "warm_friendly";
+        talentLook.value = "Casual";
+        talentPersonality.value = "Friendly, sedikit playful";
+      } else if (type === "skincare") {
+        videoStyle.value = "Cinematic natural, Close-up texture, Daily routine";
+        hookType.value = "Problem hook, Visual hook";
+        angleType.value = "Problem-solution, Test sendiri di rumah";
+        notes.value = "Close up kulit muka dengan lighting lembut, background putih minimal, vibe clean dan premium.";
+        voiceEmotion.value = "calm_trust";
+        talentLook.value = "Minimalist, clean girl / hijabista";
+        talentPersonality.value = "Soft-spoken, meyakinkan";
+      } else if (type === "service") {
+        videoStyle.value = "Educational UGC, Corporate casual, Talking head";
+        hookType.value = "Story hook, Problem hook";
+        angleType.value = "Problem-solution, Testimoni klien";
+        notes.value = "Shoot di ofis / ruang kerja, ada laptop dan whiteboard, rasa profesional tapi santai.";
+        voiceEmotion.value = "professional_clear";
+        talentLook.value = "Smart casual / blazer ringan";
+        talentPersonality.value = "Calm & warm, trusted advisor";
+      } else if (type === "app") {
+        videoStyle.value = "Screen recording + facecam, Tutorial ringkas";
+        hookType.value = "Sound hook, Reaction hook";
+        angleType.value = "Demo pantas, Before/After masa guna app";
+        notes.value = "Campur screen recording app dengan shot muka reaction, suasana meja kerja yang tersusun.";
+        voiceEmotion.value = "excited";
+        talentLook.value = "Casual techie";
+        talentPersonality.value = "Energetic, friendly";
+      } else if (type === "fashion") {
+        videoStyle.value = "OOTD montage, Lifestyle cinematic";
+        hookType.value = "Visual hook, Story hook";
+        angleType.value = "Daily routine, Before/After styling";
+        notes.value = "Outdoor golden hour, movement slow motion, fokus pada detail kain dan flow baju.";
+        voiceEmotion.value = "warm_friendly";
+        talentLook.value = "Trendy / modest fashion";
+        talentPersonality.value = "Confident, playful";
+      }
+    }
+
+    presetButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const type = btn.getAttribute("data-preset");
+        applyPreset(type, btn);
+      });
+    });
+
+    function valueOrEmpty(id) {
+      const el = document.getElementById(id);
+      return el ? el.value.trim() : "";
+    }
+
+    function splitToArray(str) {
+      if (!str) return [];
+      return str.split(",").map(s => s.trim()).filter(Boolean);
+    }
+
+    function generateScenes(sceneCount, totalDuration) {
+      const baseDur = totalDuration / sceneCount;
+      const scenes = [];
+      const purposes = ["Hook", "Intro produk", "Demo", "Detail", "Social proof", "CTA"];
+
+      for (let i = 0; i < sceneCount; i++) {
+        const purpose = purposes[i] || "Detail";
+        let cameraShot = "medium_shot";
+        if (i === 0) cameraShot = "close_up";
+        else if (i === sceneCount - 1) cameraShot = "medium_close_up";
+
+        const movement = i === 0 ? "handheld" : i === sceneCount - 1 ? "slow_push_in" : "static";
+
+        let dialogue = "";
+        if (purpose === "Hook") {
+          dialogue = "Aa.. kau pernah rasa macam, setiap hari penat.. tapi makanan pun tak sempat nak betul-betul enjoy?";
+        } else if (purpose === "Intro produk") {
+          dialogue = "Hari ni saya nak tunjuk satu solusi simple.. yang memang buat saya rasa lagi tenang dan puas hati setiap kali makan.";
+        } else if (purpose === "Demo") {
+          dialogue = "Tengok ni.. cara saya guna produk ni step by step.. senang je, dalam beberapa minit dah siap.";
+        } else if (purpose === "Detail") {
+          dialogue = "Apa yang saya paling suka.. rasa dia konsisten, bahan pun nampak jujur.. dan mudah nak masuk dalam rutin harian.";
+        } else if (purpose === "Social proof") {
+          dialogue = "Ramai kawan-kawan saya pun dah cuba.. dan feedback mereka lebih kurang sama – rasa lagi senang, lagi yakin.";
+        } else if (purpose === "CTA") {
+          dialogue = "Kalau kau pun tengah cari solusi macam ni.. boleh je cuba dulu pelan paling basic.. tengok sendiri beza dia macamana.";
+        }
+
+        scenes.push({
+          scene_number: i + 1,
+          purpose: purpose,
+          duration_s: Math.round(baseDur * 10) / 10,
+          camera_shot: cameraShot,
+          movement_style: movement,
+          scene_description: "Visual ikut konteks produk – selaras dengan nota tambahan visual.",
+          dialogue: dialogue,
+          overlay_text: purpose === "Hook" ? "Real talk sekejap" :
+                        purpose === "CTA" ? "Cuba dulu, rasa sendiri" : "",
+          emotion_level: i === 0 || purpose === "CTA" ? "high" : "medium"
+        });
+      }
+      return scenes;
+    }
+
+    function generateJSON() {
+      const productName = valueOrEmpty("product_name") || "Nama Produk";
+      const productType = valueOrEmpty("product_type") || "Produk";
+      const productCategory = valueOrEmpty("product_category") || "Kategori";
+      const mainBenefits = splitToArray(valueOrEmpty("main_benefits"));
+      const sellingPoints = splitToArray(valueOrEmpty("selling_points"));
+
+      const videoStyleCategory = valueOrEmpty("video_style_category") || "Lifestyle casual";
+      const ugcHookType = valueOrEmpty("ugc_hook_type") || "Visual hook";
+      const ugcAngleType = valueOrEmpty("ugc_angle_type") || "Honest review";
+
+      const talentGender = valueOrEmpty("talent_gender") || "Any";
+      const talentAgeRange = valueOrEmpty("talent_age_range") || "25–34";
+      const talentLook = valueOrEmpty("talent_look") || "Casual";
+      const talentPersonality = valueOrEmpty("talent_personality") || "Friendly";
+      const clothingStyle = valueOrEmpty("clothing_style") || "Casual";
+
+      const voiceTempo = parseFloat(valueOrEmpty("voice_tempo") || "0.94");
+      const voiceEmotion = valueOrEmpty("voice_emotion") || "warm_friendly";
+
+      const vibranceLevel = parseFloat(valueOrEmpty("vibrance_level") || "12");
+      const exposureLevel = parseFloat(valueOrEmpty("exposure_level") || "0.2");
+      const temperature = valueOrEmpty("temperature") || "warm";
+
+      const additionalNotes = valueOrEmpty("additional_notes") || "";
+      const sceneCount = Math.max(3, Math.min(6, parseInt(valueOrEmpty("scene_count") || "4", 10)));
+      const durationTarget = parseInt(valueOrEmpty("duration_target") || "12", 10);
+
+      const json = {
+        meta: {
+          template_name: `UGC – ${productName} – Auto Generated by Sora Malaya`,
+          version: "v1.1-auto-pro+",
+          video_type: "UGC Content",
+          aspect_ratio: "9:16",
+          duration_target_s: durationTarget,
+          platform: "Reels/TikTok/Shorts"
+        },
+        product: {
+          name: productName,
+          type: productType,
+          category: productCategory,
+          main_benefits: mainBenefits,
+          selling_points: sellingPoints
+        },
+        video_style: {
+          category: videoStyleCategory
+        },
+        ugc_style: {
+          hook_type: ugcHookType,
+          angle_type: ugcAngleType,
+          hook_description: "Hook visual + emosi yang muncul dalam 1–2 saat pertama, terus buat penonton rasa ‘eh, ni aku sangat’.",
+          angle_description: "Angle cerita jujur, seolah-olah kawan sendiri kongsi pengalaman dan solusi selepas guna produk."
+        },
+        talent: {
+          gender: talentGender,
+          age_range: talentAgeRange,
+          look: talentLook,
+          personality: talentPersonality,
+          clothing: clothingStyle
+        },
+        voice_settings: {
+          tempo: voiceTempo,
+          emotion: voiceEmotion,
+          breathing_enabled: true,
+          natural_pauses: true,
+          robotic_filter_reduction: true,
+          notes: "Dialog dibahagi pendek-pendek, ada nafas dan ‘aa..’, ‘hmm..’ bila sesuai supaya lipsync nampak natural."
+        },
+        color_grade: {
+          vibrance: vibranceLevel,
+          exposure: exposureLevel,
+          temperature: temperature,
+          contrast_level: "medium"
+        },
+        audio_mix: {
+          voice_volume: 1.0,
+          bg_music_volume: 0.35,
+          sfx_volume: 0.4,
+          bg_music_style: "soft_lofi",
+          ducking_on_dialogue: true
+        },
+        global_notes: {
+          lighting: additionalNotes || "Lighting lembut, tidak terlalu harsh. Ikut mood yang selari dengan produk.",
+          pace_note: "Dialog pendek, ada nafas, jangan terlalu rapat antara ayat.",
+          emotion_note: "Nada jujur, santai, macam kawan cerita – bukan terlalu skrip.",
+          cta_note: "CTA lembut tetapi jelas, beri pilihan untuk ‘cuba dulu’."
+        },
+        scenes: generateScenes(sceneCount, durationTarget),
+        cta_presets_used: {
+          type: "soft",
+          line: "Kalau kau rasa ini boleh bantu rutin harian kau.. cuba je dulu dan rasa sendiri beza dia."
+        }
+      };
+
+      outputEl.value = JSON.stringify(json, null, 2);
+    }
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      generateJSON();
+    });
+
+    copyBtn.addEventListener("click", function () {
+      if (!outputEl.value.trim()) return;
+      outputEl.select();
+      document.execCommand("copy");
+      copyBtn.classList.add("success");
+      copyBtn.textContent = "✅ Copied";
+      setTimeout(() => {
+        copyBtn.classList.remove("success");
+        copyBtn.textContent = "📋 Copy JSON";
+      }, 1500);
+    });
+
+    // Pada load: biar form kosong, tiada JSON auto keluar
+    window.addEventListener("load", () => {
+      if (outputEl) outputEl.value = "";
+    });
+  </script>
+</body>
+</html>
