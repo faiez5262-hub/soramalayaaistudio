@@ -1,1 +1,586 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<title>UGC Auto JSON Builder – Gold/Black Premium</title>
 
+<style>
+/* ============================================================
+   ULTRA PREMIUM GOLD & BLACK EMBOSSED UI
+   ============================================================ */
+
+:root {
+  --bg-main: #050507;
+  --bg-card: #050507;
+  --bg-card-soft: #0b0b10;
+
+  --accent-gold: #f6d37a;
+  --accent-gold-soft: #b88a33;
+  --accent-gold-deep: #8a621f;
+
+  --text-main: #f5f5f5;
+  --text-muted: #a3a3a3;
+
+  --radius-lg: 20px;
+  --radius-md: 12px;
+
+  --shadow-soft: 0 22px 50px rgba(0,0,0,0.9);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: radial-gradient(circle at top, #111111 0%, #050507 50%, #020203 100%);
+  color: var(--text-main);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
+}
+
+/* Wrapper */
+.ugcpreset-section {
+  max-width: 960px;
+  margin: 30px auto 40px;
+  padding: 20px;
+}
+
+/* Header */
+.section-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.section-title {
+  font-size: 0.92rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.section-sub {
+  color: var(--accent-gold);
+}
+
+.section-caption {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 5px;
+}
+
+/* Badge */
+.badge-ai {
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  border: 1px solid rgba(246,211,122,0.7);
+  background: radial-gradient(circle at top left, rgba(246,211,122,0.22), transparent 55%);
+  color: #fefce8;
+  white-space: nowrap;
+}
+
+/* Category Buttons */
+.category-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.cat-btn {
+  padding: 8px 14px;
+  background: #0b0b10;
+  border: 1px solid rgba(255,255,255,0.17);
+  border-radius: 999px;
+  color: #eee;
+  font-size: 0.8rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  cursor: pointer;
+  transition: all 0.15s ease-out;
+}
+
+.cat-btn:hover {
+  border-color: rgba(246,211,122,0.6);
+  box-shadow: 0 0 12px rgba(246,211,122,0.3);
+  transform: translateY(-1px);
+}
+
+.cat-btn-active {
+  border: 1px solid rgba(246,211,122,0.9);
+  background:
+    radial-gradient(circle at top left, rgba(246,211,122,0.45), rgba(184,138,51,0.35)),
+    #050507;
+  box-shadow:
+    0 0 0 1px rgba(246,211,122,0.4),
+    0 8px 18px rgba(0,0,0,0.9),
+    inset 0 1px 0 rgba(255,255,255,0.12),
+    inset 0 -1px 0 rgba(0,0,0,0.8);
+}
+
+.cat-sub {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+/* Info Pill */
+.info-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.78rem;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: #0b0b10;
+  border: 1px dashed rgba(246,211,122,0.35);
+  margin-bottom: 18px;
+  color: var(--text-muted);
+}
+
+.dot-green {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #22c55e;
+  box-shadow: 0 0 10px rgba(34,197,94,0.85);
+}
+
+/* Main Card */
+.preset-card {
+  border-radius: 22px;
+  padding: 22px 20px 20px;
+  background:
+    radial-gradient(circle at top left, rgba(246,211,122,0.12), transparent 55%),
+    radial-gradient(circle at bottom right, rgba(184,138,51,0.13), transparent 55%),
+    #050507;
+  border: 1px solid rgba(246,211,122,0.55);
+  box-shadow:
+    0 0 0 1px rgba(138,98,31,0.55),
+    0 22px 50px rgba(0,0,0,0.95),
+    inset 0 1px 0 rgba(255,255,255,0.08),
+    inset 0 -1px 0 rgba(0,0,0,0.8);
+}
+
+/* Fields */
+.field-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.field-grid-2col {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.field {
+  padding: 12px;
+  background: #0b0b10;
+  border-radius: 14px;
+  border: 1px solid rgba(246,211,122,0.28);
+}
+
+.field-label {
+  font-size: 0.78rem;
+  color: var(--accent-gold);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.field-input {
+  position: relative;
+  margin-top: 6px;
+}
+
+.field-input input {
+  width: 100%;
+  padding: 9px 12px;
+  border-radius: 12px;
+  background: #050507;
+  border: 1px solid rgba(255,255,255,0.16);
+  color: #fefefe;
+  font-size: 0.82rem;
+  outline: none;
+  transition: border-color 0.14s ease-out, box-shadow 0.14s ease-out;
+}
+
+.field-input input::placeholder {
+  color: rgba(148,148,148,0.8);
+}
+
+.field-input input:focus {
+  border-color: rgba(246,211,122,0.8);
+  box-shadow: 0 0 0 1px rgba(246,211,122,0.6);
+}
+
+/* Buttons Bar */
+.actions-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+/* Main Generate Button */
+.generate-btn {
+  flex: 1 1 180px;
+  padding: 12px;
+  border-radius: 14px;
+  font-size: 0.95rem;
+  background: linear-gradient(135deg, #f6d37a, #b88a33);
+  border: none;
+  color: #050507;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 0 15px rgba(246,211,122,0.4);
+  position: relative;
+  overflow: hidden;
+}
+
+.generate-btn:hover {
+  box-shadow: 0 0 25px rgba(246,211,122,0.8);
+}
+
+.generate-btn::after {
+  content: "";
+  position: absolute;
+  left: -40%;
+  top: 0;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(120deg, rgba(255,255,255,0.6), transparent);
+  transform: skewX(-30deg);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.generate-btn:hover::after {
+  animation: goldShine 0.9s ease-out;
+}
+
+@keyframes goldShine {
+  0% { transform: translateX(-100%) skewX(-30deg); opacity: 0; }
+  40% { opacity: 1; }
+  100% { transform: translateX(260%) skewX(-30deg); opacity: 0; }
+}
+
+/* Secondary Buttons */
+.secondary-btn {
+  flex: 0 0 auto;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  background: #0b0b10;
+  border: 1px solid rgba(246,211,122,0.5);
+  color: #fefce8;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s ease-out;
+}
+
+.secondary-btn:hover {
+  background: rgba(246,211,122,0.18);
+}
+
+.secondary-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* JSON Output */
+.json-output {
+  margin-top: 18px;
+  background: #0b0b10;
+  padding: 18px;
+  border-radius: 14px;
+  border: 1px solid rgba(246,211,122,0.4);
+  white-space: pre-wrap;
+  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 0.85rem;
+  color: #f6d37a;
+  min-height: 80px;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .ugcpreset-section {
+    padding-inline: 14px;
+  }
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<section class="ugcpreset-section">
+
+  <!-- Header -->
+  <div class="section-header">
+    <div>
+      <h2 class="section-title">
+        PRESET AUTO ISI <span class="section-sub">(Opsyen)</span>
+      </h2>
+      <p class="section-caption">
+        Pilih kategori, sistem akan auto-isi contoh UGC. Anda masih boleh ubah mengikut produk sebenar.
+      </p>
+    </div>
+    <span class="badge-ai">⚡ AI Preset Active</span>
+  </div>
+
+  <!-- Category Buttons -->
+  <div class="category-row" id="categoryRow">
+    <button class="cat-btn" onclick="applyPreset('food', this)">
+      🍔 Food / F&amp;B
+      <span class="cat-sub">Review • POV • Texture</span>
+    </button>
+
+    <button class="cat-btn" onclick="applyPreset('skincare', this)">
+      💧 Skincare / Beauty
+      <span class="cat-sub">Glow • Before/After</span>
+    </button>
+
+    <button class="cat-btn" onclick="applyPreset('services', this)">
+      👨‍🏫 Servis / Coaching
+      <span class="cat-sub">Edu • Tips</span>
+    </button>
+
+    <button class="cat-btn" onclick="applyPreset('software', this)">
+      📱 App / Software
+      <span class="cat-sub">Screen • Demo</span>
+    </button>
+
+    <button class="cat-btn" onclick="applyPreset('fashion', this)">
+      👗 Fashion / Outfit
+      <span class="cat-sub">OOTD • Try-on</span>
+    </button>
+  </div>
+
+  <div class="info-pill">
+    <span class="dot-green"></span>
+    Preset hanya isi contoh – boleh edit semula sebelum generate JSON.
+  </div>
+
+  <!-- Main Card -->
+  <div class="preset-card">
+
+    <div class="field-grid field-grid-2col">
+
+      <!-- Video Style -->
+      <div class="field">
+        <label class="field-label">🎬 Video Style Category</label>
+        <div class="field-input">
+          <input id="video_style" placeholder="">
+        </div>
+      </div>
+
+      <!-- Hook -->
+      <div class="field">
+        <label class="field-label">⚡ UGC Hook Type</label>
+        <div class="field-input">
+          <input id="ugc_hook" placeholder="">
+        </div>
+      </div>
+
+      <!-- Angle -->
+      <div class="field">
+        <label class="field-label">🎯 UGC Angle Type</label>
+        <div class="field-input">
+          <input id="ugc_angle" placeholder="">
+        </div>
+      </div>
+
+      <!-- Gender -->
+      <div class="field">
+        <label class="field-label">⚧ Gender Talent</label>
+        <div class="field-input">
+          <input id="gender" placeholder="">
+        </div>
+      </div>
+
+      <!-- Age -->
+      <div class="field">
+        <label class="field-label">📊 Umur Talent</label>
+        <div class="field-input">
+          <input id="age" placeholder="">
+        </div>
+      </div>
+
+      <!-- Look -->
+      <div class="field">
+        <label class="field-label">👕 Gaya Look</label>
+        <div class="field-input">
+          <input id="look_style" placeholder="">
+        </div>
+      </div>
+
+      <!-- Personality -->
+      <div class="field">
+        <label class="field-label">✨ Personaliti Talent</label>
+        <div class="field-input">
+          <input id="personality" placeholder="">
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="actions-row">
+      <button class="generate-btn" onclick="generateJSON()">
+        🚀 Generate JSON
+      </button>
+
+      <button id="copyBtn" class="secondary-btn" onclick="copyJSON()" disabled>
+        📋 Copy JSON
+      </button>
+
+      <button id="downloadBtn" class="secondary-btn" onclick="downloadJSON()" disabled>
+        💾 Download .json
+      </button>
+    </div>
+
+    <!-- JSON Output -->
+    <pre id="jsonoutput" class="json-output"></pre>
+
+  </div>
+</section>
+
+<script>
+/* ============================================================
+   PRESET AUTOFILL SYSTEM
+   ============================================================ */
+
+const presets = {
+  food: {
+    video_style: "Food review, POV harian, Lifestyle casual",
+    hook: "Visual hook, Reaction hook",
+    angle: "Honest review, First time try",
+    gender: "Male/Female",
+    age: "20–35",
+    look: "Casual streetwear",
+    personality: "Friendly & cheerful"
+  },
+  skincare: {
+    video_style: "Skincare routine, Soft aesthetic, Macro texture",
+    hook: "Texture macro hook",
+    angle: "Before/After angle",
+    gender: "Female",
+    age: "18–30",
+    look: "Clean beauty, Minimalist",
+    personality: "Soft, slow, clean"
+  },
+  services: {
+    video_style: "Talking head educational, Clean background",
+    hook: "Value hook, Problem statement",
+    angle: "Educational angle",
+    gender: "Male/Female",
+    age: "25–45",
+    look: "Smart casual",
+    personality: "Confident educator"
+  },
+  software: {
+    video_style: "Screen demo, Clean UI showcase",
+    hook: "“App ni jimatkan masa saya 70%”",
+    angle: "Problem → Solution (tech)",
+    gender: "Narrator",
+    age: "Any",
+    look: "Neutral",
+    personality: "Clear corporate tone"
+  },
+  fashion: {
+    video_style: "Mirror shot, Try-on haul, Aesthetic OOTD",
+    hook: "Try-on hook",
+    angle: "Actual fit review",
+    gender: "Female",
+    age: "18–30",
+    look: "Trendy outfit",
+    personality: "Playful stylish"
+  }
+};
+
+function applyPreset(type, btnEl) {
+  const p = presets[type];
+  if (!p) return;
+
+  // Autofill fields
+  document.getElementById("video_style").value = p.video_style;
+  document.getElementById("ugc_hook").value = p.hook;
+  document.getElementById("ugc_angle").value = p.angle;
+  document.getElementById("gender").value = p.gender;
+  document.getElementById("age").value = p.age;
+  document.getElementById("look_style").value = p.look;
+  document.getElementById("personality").value = p.personality;
+
+  // Update active button
+  const buttons = document.querySelectorAll("#categoryRow .cat-btn");
+  buttons.forEach(b => b.classList.remove("cat-btn-active"));
+  if (btnEl) btnEl.classList.add("cat-btn-active");
+}
+
+/* ============================================================
+   JSON GENERATOR + COPY + DOWNLOAD
+   ============================================================ */
+
+function generateJSON() {
+  const json = {
+    video_style: document.getElementById("video_style").value.trim(),
+    ugc_hook: document.getElementById("ugc_hook").value.trim(),
+    ugc_angle: document.getElementById("ugc_angle").value.trim(),
+    talent_gender: document.getElementById("gender").value.trim(),
+    talent_age: document.getElementById("age").value.trim(),
+    look_style: document.getElementById("look_style").value.trim(),
+    personality: document.getElementById("personality").value.trim()
+  };
+
+  const output = document.getElementById("jsonoutput");
+  output.textContent = JSON.stringify(json, null, 2);
+
+  // Enable copy & download
+  document.getElementById("copyBtn").disabled = false;
+  document.getElementById("downloadBtn").disabled = false;
+}
+
+async function copyJSON() {
+  const output = document.getElementById("jsonoutput").textContent.trim();
+  if (!output) return;
+
+  try {
+    await navigator.clipboard.writeText(output);
+    const btn = document.getElementById("copyBtn");
+    const originalText = btn.textContent;
+    btn.textContent = "✅ Copied!";
+    setTimeout(() => {
+      btn.textContent = "📋 Copy JSON";
+    }, 1200);
+  } catch (err) {
+    alert("Clipboard tidak disokong dalam browser ini.");
+  }
+}
+
+function downloadJSON() {
+  const output = document.getElementById("jsonoutput").textContent.trim();
+  if (!output) return;
+
+  const blob = new Blob([output], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "ugc_preset.json";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+</script>
+
+</body>
+</html>
