@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<title>UGC + Product/Service Auto-Preset Generator (Gold/Black Edition)</title>
+<style>
+:root {
+  --bg-main: #050507;
+  --bg-card: #0c0c10;
+  --accent-gold: #f6d37a;
+  --accent-gold-soft: #b88a33;
+  --text-main: #ffffff;
+  --text-muted: #cfcfcf;
+  --radius: 18px;
+}
+
+/* Page */
+body {
+  background: var(--bg-main);
+  font-family: "Inter", system-ui, sans-serif;
+  color: var(--text-main);
+  margin: 0;
+  padding: 24px 12px 40px;
+}
+
+h2 {
+  font-size: 1.2rem;
+  margin: 0 0 16px;
+  text-align: center;
+  background: linear-gradient(to right, var(--accent-gold), #fff5d4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Card */
+.card {
+  max-width: 960px;
+  margin: 0 auto 24px;
+  background: radial-gradient(circle at top left, rgba(246,211,122,0.08), transparent 55%), var(--bg-card);
+  border-radius: var(--radius);
+  padding: 18px 16px 20px;
+  border: 1px solid rgba(246,211,122,0.55);
+  box-shadow:
+    0 0 0 1px rgba(138,98,31,0.4),
+    0 15px 40px rgba(0,0,0,0.9),
+    inset 0 1px 0 rgba(255,255,255,0.08),
+    inset 0 -1px 0 rgba(0,0,0,0.9);
+}
+
+.card h3 {
+  margin-top: 0;
+  font-size: 0.95rem;
+}
+
+/* Preset buttons row */
+.preset-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+/* Preset button */
+.preset-btn {
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  border: 1px solid rgba(246,211,122,0.5);
+  background: #050507;
+  cursor: pointer;
+  transition: 0.18s;
+  color: #fefce8;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.preset-btn:hover {
+  box-shadow: 0 0 12px rgba(246,211,122,0.5);
+  transform: translateY(-1px);
+}
+
+.preset-btn.active {
+  background: linear-gradient(to bottom right, var(--accent-gold), var(--accent-gold-soft));
+  color: #050507;
+  border-color: var(--accent-gold);
+  box-shadow:
+    0 0 0 1px rgba(246,211,122,0.7),
+    0 10px 22px rgba(0,0,0,0.9),
+    inset 0 1px 0 rgba(255,255,255,0.2);
+}
+
+/* Form */
+label {
+  font-size: 0.85rem;
+  display: block;
+  margin-top: 10px;
+}
+
+select, textarea {
+  width: 100%;
+  padding: 10px 12px;
+  margin-top: 6px;
+  border-radius: 12px;
+  border: 1px solid rgba(246,211,122,0.4);
+  background: #050507;
+  color: var(--text-main);
+  font-size: 0.82rem;
+}
+
+select option[value=""] {
+  color: #777777; /* placeholder kelabu */
+}
+
+select:focus, textarea:focus {
+  outline: none;
+  border-color: rgba(246,211,122,0.85);
+  box-shadow: 0 0 0 1px rgba(246,211,122,0.6);
+}
+
+textarea {
+  min-height: 60px;
+  resize: vertical;
+}
+
+/* Generate button */
+.generate-btn {
+  width: 100%;
+  margin-top: 18px;
+  padding: 14px;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  font-weight: 600;
+  border: none;
+  background: linear-gradient(to right, var(--accent-gold), var(--accent-gold-soft));
+  color: #050507;
+  box-shadow: 0 0 18px rgba(246,211,122,0.6);
+}
+
+.generate-btn:hover {
+  opacity: 0.92;
+}
+
+/* JSON actions + output */
+.json-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-top: 18px;
+  margin-bottom: 6px;
+}
+
+.json-title {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.copy-btn {
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(246,211,122,0.7);
+  background: #050507;
+  color: #fefce8;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.copy-btn:hover {
+  background: rgba(246,211,122,0.18);
+}
+
+#output {
+  background: #050507;
+  padding: 14px;
+  border-radius: 12px;
+  white-space: pre-wrap;
+  border: 1px solid rgba(246,211,122,0.45);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;
+  font-size: 0.8rem;
+  min-height: 70px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  body { padding: 18px 8px 30px; }
+  .card { padding-inline: 12px; }
+}
+</style>
+</head>
+<body>
+
+<h2>✨ UGC + Product/Service Auto-Preset Generator (Gold/Black Edition)</h2>
+
+<!-- Preset Product/Service -->
+<div class="card">
+  <h3>🧩 Preset Produk / Perkhidmatan</h3>
+  <div class="preset-buttons">
+    <button class="preset-btn" onclick="loadPreset('food', this)">🍔 Food / F&B</button>
+    <button class="preset-btn" onclick="loadPreset('skincare', this)">💧 Skincare / Beauty</button>
+    <button class="preset-btn" onclick="loadPreset('services', this)">👨‍🏫 Servis / Coaching</button>
+    <button class="preset-btn" onclick="loadPreset('app', this)">📱 App / Software</button>
+    <button class="preset-btn" onclick="loadPreset('fashion', this)">👗 Fashion / Outfit</button>
+    <button class="preset-btn" onclick="loadPreset('home', this)">🛋 Home & Living</button>
+    <button class="preset-btn" onclick="loadPreset('gadget', this)">🔌 Gadget / Tech</button>
+    <button class="preset-btn" onclick="loadPreset('health', this)">💊 Health / Wellness</button>
+    <button class="preset-btn" onclick="loadPreset('baby', this)">🍼 Baby / Parenting</button>
+    <button class="preset-btn" onclick="loadPreset('property', this)">🏡 Property</button>
+    <button class="preset-btn" onclick="loadPreset('auto', this)">🚗 Automotive</button>
+    <button class="preset-btn" onclick="loadPreset('luxury', this)">💎 Luxury / Premium</button>
+    <button class="preset-btn" onclick="loadPreset('creative', this)">🎨 Creative / Hobby</button>
+  </div>
+</div>
+
+<!-- UGC Form -->
+<div class="card">
+  <h3>🎬 UGC Template Builder</h3>
+
+  <label>Video Style</label>
+  <select id="video_style">
+    <option value="">— Pilih atau ikut preset —</option>
+    <option>UGC Raw</option>
+    <option>POV Lifestyle</option>
+    <option>Aesthetic B-roll</option>
+    <option>Face to Camera Review</option>
+  </select>
+
+  <label>Personality</label>
+  <select id="personality">
+    <option value="">— Pilih atau ikut preset —</option>
+    <option>Friendly & Cheerful</option>
+    <option>Honest & Straightforward</option>
+    <option>Soft-spoken</option>
+    <option>Energetic & Fun</option>
+    <option>Professional</option>
+  </select>
+
+  <label>Clothing</label>
+  <select id="clothing">
+    <option value="">— Pilih atau ikut preset —</option>
+    <option>Casual</option>
+    <option>Smart Casual</option>
+    <option>Professional</option>
+    <option>Hijab Proper</option>
+  </select>
+
+  <label>UGC Hook</label>
+  <select id="ugc_hook">
+    <option value="">— Pilih atau ikut preset —</option>
+    <option>Visual Hook</option>
+    <option>Reaction Hook</option>
+    <option>Problem Statement Hook</option>
+    <option>Curiosity Hook</option>
+  </select>
+
+  <label>UGC Angle</label>
+  <select id="ugc_angle">
+    <option value="">— Pilih atau ikut preset —</option>
+    <option>Honest Review</option>
+    <option>First Time Try</option>
+    <option>Before & After</option>
+    <option>Tutorial Step-by-Step</option>
+  </select>
+
+  <label>Main Benefits</label>
+  <textarea id="benefits" placeholder="Contoh: Rasa sedap, portion besar, packaging kemas"></textarea>
+
+  <label>Selling Point</label>
+  <textarea id="selling" placeholder="Contoh: Fresh bahan, value for money, halal"></textarea>
+
+  <label>Additional Notes</label>
+  <textarea id="notes" placeholder="Contoh: Letak shot close-up produk, jangan terlalu laju, tone lembut."></textarea>
+
+  <button class="generate-btn" onclick="generateJSON()">Generate JSON</button>
+
+  <div class="json-header">
+    <span class="json-title">🔐 JSON Output (siap untuk copy)</span>
+    <button class="copy-btn" onclick="copyJSON()">📋 Copy JSON</button>
+  </div>
+  <pre id="output"></pre>
+</div>
+
+<script>
+const presets = {
+  food: {
+    video_style: "POV Lifestyle",
+    personality: "Friendly & Cheerful",
+    clothing: "Smart Casual",
+    ugc_hook: "Reaction Hook",
+    ugc_angle: "Before & After",
+    benefits: "Rasa sedap, portion besar, packaging kemas",
+    selling: "Fresh bahan, value for money, halal",
+    notes: "Letak shot close-up makanan"
+  },
+  skincare: {
+    video_style: "Aesthetic B-roll",
+    personality: "Soft-spoken",
+    clothing: "Hijab Proper",
+    ugc_hook: "Problem Statement Hook",
+    ugc_angle: "Before & After",
+    benefits: "Kulit lebih lembap dan glowing",
+    selling: "Dermatology tested, sesuai kulit sensitif",
+    notes: "Pastikan lighting lembut dan flattering"
+  },
+  services: {
+    video_style: "Face to Camera Review",
+    personality: "Honest & Straightforward",
+    clothing: "Professional",
+    ugc_hook: "Curiosity Hook",
+    ugc_angle: "Experience Sharing",
+    benefits: "Servis pantas, mudah, dan mesra pelanggan",
+    selling: "Team berpengalaman, testimoni tinggi",
+    notes: "Tone suara yakin tapi tidak agresif"
+  },
+  app: {
+    video_style: "Face to Camera Review",
+    personality: "Friendly & Cheerful",
+    clothing: "Casual",
+    ugc_hook: "Problem Statement Hook",
+    ugc_angle: "Tutorial Step-by-Step",
+    benefits: "Mudahkan kerja harian, jimat masa",
+    selling: "UI simple, support cepat",
+    notes: "Pastikan screen recording jelas"
+  },
+  fashion: {
+    video_style: "POV Lifestyle",
+    personality: "Energetic & Fun",
+    clothing: "Casual",
+    ugc_hook: "Visual Hook",
+    ugc_angle: "First Time Try",
+    benefits: "Nampak lebih bergaya & yakin",
+    selling: "Material selesa, design terkini",
+    notes: "Tunjuk full body dan detail kain"
+  },
+  home: {
+    video_style: "Aesthetic B-roll",
+    personality: "Soft-spoken",
+    clothing: "Casual",
+    ugc_hook: "Visual Hook",
+    ugc_angle: "Before & After",
+    benefits: "Rumah nampak lebih kemas & cozy",
+    selling: "Mudah dipasang, tahan lama",
+    notes: "Highlight sudut before & after jelas"
+  },
+  gadget: {
+    video_style: "Face to Camera Review",
+    personality: "Honest & Straightforward",
+    clothing: "Casual",
+    ugc_hook: "Problem Statement Hook",
+    ugc_angle: "Honest Review",
+    benefits: "Performance laju, bateri tahan lama",
+    selling: "Warranty jelas, support tersedia",
+    notes: "Tunjuk demo penggunaan ringkas"
+  },
+  health: {
+    video_style: "POV Lifestyle",
+    personality: "Soft-spoken",
+    clothing: "Casual",
+    ugc_hook: "Curiosity Hook",
+    ugc_angle: "Experience Sharing",
+    benefits: "Badan rasa lebih ringan & bertenaga",
+    selling: "Formula selamat, bernotifikasi KKM (jika ada)",
+    notes: "Elak buat claim melampau"
+  },
+  baby: {
+    video_style: "POV Lifestyle",
+    personality: "Friendly & Cheerful",
+    clothing: "Casual",
+    ugc_hook: "Visual Hook",
+    ugc_angle: "Experience Sharing",
+    benefits: "Mudahkan rutin ibu bapa",
+    selling: "Selamat untuk bayi, bahan lembut",
+    notes: "Suasana lembut dan warm"
+  },
+  property: {
+    video_style: "Aesthetic B-roll",
+    personality: "Professional",
+    clothing: "Professional",
+    ugc_hook: "Curiosity Hook",
+    ugc_angle: "Highlight Feature",
+    benefits: "Lokasi strategik, ruang luas",
+    selling: "Harga kompetitif, fasiliti lengkap",
+    notes: "Masukkan shot wide & detail interior"
+  },
+  auto: {
+    video_style: "POV Lifestyle",
+    personality: "Energetic & Fun",
+    clothing: "Casual",
+    ugc_hook: "Visual Hook",
+    ugc_angle: "Test Drive Feel",
+    benefits: "Pemanduan selesa, jimat minyak",
+    selling: "Warranty & servis mudah",
+    notes: "Shot dalam kereta + exterior"
+  },
+  luxury: {
+    video_style: "Aesthetic B-roll",
+    personality: "Soft-spoken",
+    clothing: "Smart Casual",
+    ugc_hook: "Visual Hook",
+    ugc_angle: "Soft-Selling Emotional",
+    benefits: "Nampak lebih eksklusif & premium",
+    selling: "Kualiti tinggi, limited edition",
+    notes: "Lighting warm, movement perlahan"
+  },
+  creative: {
+    video_style: "UGC Raw",
+    personality: "Energetic & Fun",
+    clothing: "Casual",
+    ugc_hook: "Curiosity Hook",
+    ugc_angle: "Tutorial Step-by-Step",
+    benefits: "Senang ikut, boleh cuba sendiri",
+    selling: "Tools mesra beginner",
+    notes: "Pace laju, banyak cut menarik"
+  }
+};
+
+function loadPreset(type, btnEl) {
+  const p = presets[type];
+  if (!p) return;
+
+  document.getElementById("video_style").value = p.video_style;
+  document.getElementById("personality").value = p.personality;
+  document.getElementById("clothing").value = p.clothing;
+  document.getElementById("ugc_hook").value = p.ugc_hook;
+  document.getElementById("ugc_angle").value = p.ugc_angle;
+  document.getElementById("benefits").value = p.benefits;
+  document.getElementById("selling").value = p.selling;
+  document.getElementById("notes").value = p.notes;
+
+  // highlight active button
+  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+  if (btnEl) btnEl.classList.add('active');
+}
+
+function generateJSON() {
+  const json = {
+    video_style: document.getElementById("video_style").value,
+    personality: document.getElementById("personality").value,
+    clothing: document.getElementById("clothing").value,
+    ugc_hook: document.getElementById("ugc_hook").value,
+    ugc_angle: document.getElementById("ugc_angle").value,
+    benefits: document.getElementById("benefits").value,
+    selling: document.getElementById("selling").value,
+    notes: document.getElementById("notes").value
+  };
+  document.getElementById("output").textContent = JSON.stringify(json, null, 2);
+}
+
+async function copyJSON() {
+  const text = document.getElementById("output").textContent.trim();
+  if (!text) return;
+  try {
+    await navigator.clipboard.writeText(text);
+    const btn = document.querySelector('.copy-btn');
+    const original = btn.textContent;
+    btn.textContent = "✅ Copied!";
+    setTimeout(() => { btn.textContent = "📋 Copy JSON"; }, 1200);
+  } catch (e) {
+    alert("Clipboard tidak disokong pada browser ini.");
+  }
+}
+</script>
+
+</body>
+</html>
